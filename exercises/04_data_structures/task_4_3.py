@@ -22,3 +22,16 @@
 """
 
 config = "switchport trunk allowed vlan 1,3,10,20,30,100"
+length = len(config)
+result = []
+i = 0
+
+while i < length:
+    s_int = ''
+    while i < length and '0' <= config[i] <= '9':
+        s_int += config[i]
+        i += 1
+    i += 1
+    if s_int != '':
+        result.append(str(s_int))
+print(result)

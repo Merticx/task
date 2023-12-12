@@ -25,4 +25,9 @@
 проверять результат.
 """
 
-ip = "192.168.3.1"
+ip = "192.168.3.1".split('.')
+for i in ip:
+    print(i,' ' * (8 - len(str(i))), end='')
+print()
+for i in ip:
+    print((format(int(i), "08b")), end='                    ')

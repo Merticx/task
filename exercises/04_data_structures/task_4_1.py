@@ -16,3 +16,5 @@
 """
 
 nat = "ip nat inside source list ACL interface FastEthernet0/1 overload"
+new_nat = nat[:40] + "GigabitEthernet" + nat[52:]
+print(new_nat)

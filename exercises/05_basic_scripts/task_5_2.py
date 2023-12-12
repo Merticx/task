@@ -30,3 +30,25 @@ Out[1]: '11111111111111111111111111110000'
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 """
+# Запросить у пользователя ввод IP-сети
+ip_network = input("Введите IP-сеть в формате x.x.x.x/x: ")
+
+# Разделить IP-адрес и маску
+network, mask = ip_network.split('/')
+
+# Разделить каждый октет IP-адреса
+octets = network.split('.')
+
+# Преобразовать каждый октет в двоичную строку
+binary_octets = [format(int(octet), '08b') for octet in octets]
+
+# Вывести информацию о сети и маске
+print("\nNetwork:")
+print("{:<10}  {:<10}  {:<10}  {:<10}".format(octets[0], octets[1], octets[2], octets[3]))
+print("{:<10}  {:<10}  {:<10}  {:<10}".format(binary_octets[0], binary_octets[1], binary_octets[2], binary_octets[3]))
+
+print("\nMask:")
+print("/" + mask)
+mask_binary = "1" * int(mask) + "0" * (32 - int(mask))
+print("{:<10}  {:<10}  {:<10}  {:<10}".format(int(mask_binary[0:8], 2), int(mask_binary[8:16], 2), int(mask_binary[16:24], 2), int(mask_binary[24:32], 2)))
+print("{:<10}  {:<10}  {:<10}  {:<10}".format(mask_binary[0:8], mask_binary[8:16], mask_binary[16:24], mask_binary[24:32]))
