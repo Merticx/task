@@ -1,16 +1,20 @@
-import sys
-
 import pytest
-
 import task_18_3
+import sys
 
 sys.path.append("..")
 
-from pyneng_common_functions import (check_function_exists,
-                                     check_pytest,
-                                     strip_empty_lines)
+from pyneng_common_functions import (
+    check_function_exists,
+    check_function_params,
+    strip_empty_lines,
+)
 
-check_pytest(__loader__, __file__)
+# Проверка что тест вызван через pytest ..., а не python ...
+from _pytest.assertion.rewrite import AssertionRewritingHook
+
+if not isinstance(__loader__, AssertionRewritingHook):
+    print(f"Тесты нужно вызывать используя такое выражение:\npytest {__file__}\n\n")
 
 
 def test_functions_created():
@@ -49,25 +53,21 @@ def test_function_return_value(r1_test_connection, first_router_from_devices_yam
         "logging buffered 20010",
         "no logging console",
     ]
-    correct_return_value_show = strip_empty_lines(
-        r1_test_connection.send_command(show_command)
+    correct_return_value_show = r1_test_connection.send_command(show_command)
+    correct_return_value_cfg = r1_test_connection.send_config_set(cfg_commands)
+    return_value_show = task_18_3.send_commands(
+        first_router_from_devices_yaml, show=show_command
     )
-    correct_return_value_cfg = strip_empty_lines(
-        r1_test_connection.send_config_set(cfg_commands)
+    return_value_cfg = task_18_3.send_commands(
+        first_router_from_devices_yaml, config=cfg_commands
     )
-    return_value_show = strip_empty_lines(
-        task_18_3.send_commands(first_router_from_devices_yaml, show=show_command)
-    )
-    return_value_cfg = strip_empty_lines(
-        task_18_3.send_commands(first_router_from_devices_yaml, config=cfg_commands)
-    )
-    assert return_value_show is not None, "Функция ничего не возвращает"
+    assert return_value_show != None, "Функция ничего не возвращает"
     assert (
         type(return_value_show) == str
     ), f"По заданию функция должна возвращать строку, а возвращает {type(return_value).__name__}"
-    assert (
-        correct_return_value_show == return_value_show
+    assert strip_empty_lines(correct_return_value_show) == strip_empty_lines(
+        return_value_show
     ), "Функция возвращает неправильное значение при передаче команды show"
-    assert (
-        correct_return_value_cfg == return_value_cfg
+    assert strip_empty_lines(correct_return_value_cfg) == strip_empty_lines(
+        return_value_cfg
     ), "Функция возвращает неправильное значение при передаче конфигурационных команд"

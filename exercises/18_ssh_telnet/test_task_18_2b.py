@@ -1,14 +1,19 @@
-import sys
+import re
 
+import yaml
 import pytest
-
 import task_18_2b
+import sys
 
 sys.path.append("..")
 
-from pyneng_common_functions import check_function_exists, check_pytest
+from pyneng_common_functions import check_function_exists
 
-check_pytest(__loader__, __file__)
+# Проверка что тест вызван через pytest ..., а не python ...
+from _pytest.assertion.rewrite import AssertionRewritingHook
+
+if not isinstance(__loader__, AssertionRewritingHook):
+    print(f"Тесты нужно вызывать используя такое выражение:\npytest {__file__}\n\n")
 
 
 correct_return_value = (
@@ -65,19 +70,17 @@ def test_function_return_value(capsys, first_router_from_devices_yaml):
     )
 
     # проверяем возвращаемое значение
-    assert return_value is not None, "Функция ничего не возвращает"
+    assert return_value != None, "Функция ничего не возвращает"
     assert type(return_value) == tuple, "Функция должна возвращать кортеж"
-    assert 2 == len(return_value) and all(
+    assert len(return_value) == 2 and all(
         type(item) == dict for item in return_value
     ), "Функция должна возвращать кортеж с двумя словарями"
     correct_good, correct_bad = correct_return_value
     return_good, return_bad = return_value
     assert (
-        correct_good.keys() == return_good.keys()
-    ), "Функция возвращает неправильное значение для словаря с командами без ошибок"
-    assert (
-        correct_bad.keys() == return_bad.keys()
-    ), "Функция возвращает неправильное значение для словаря с командами с ошибками"
+        return_good.keys() == correct_good.keys()
+        and return_bad.keys() == correct_bad.keys()
+    ), "Функция возвращает неправильное значение"
 
 
 @pytest.mark.parametrize(
@@ -98,8 +101,8 @@ def test_function_stdout(error, command, capsys, first_router_from_devices_yaml)
     # при каждой ошибке, должна выводиться информация:
     # ошибка, IP устройства, команда
     # в тесте проверяется наличие этих полей
-    stdout, err = capsys.readouterr()
+    out, err = capsys.readouterr()
     ip = first_router_from_devices_yaml["host"]
-    assert error in stdout, "В сообщении об ошибке нет самой ошибки"
-    assert command in stdout, "В сообщении об ошибке нет выполняемой команды"
-    assert ip in stdout, "В сообщении об ошибке нет IP-адреса устройства"
+    assert error in out, "В сообщении об ошибке нет самой ошибки"
+    assert command in out, "В сообщении об ошибке нет выполняемой команды"
+    assert ip in out, "В сообщении об ошибке нет IP-адреса устройства"
